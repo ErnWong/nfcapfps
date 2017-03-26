@@ -1,5 +1,7 @@
 # nfcapfps
 
+[![Build Status](https://travis-ci.org/ErnWong/nfcapfps.svg?branch=master)](https://travis-ci.org/ErnWong/nfcapfps)
+
 ```sh
 nfcapfps <fps>
 ```
