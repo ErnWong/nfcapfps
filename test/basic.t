@@ -43,6 +43,11 @@ test_expect_success 'does not send too early' "
   test 1 = 2
 "
 
+test_expect_success 'supports float as fps arg' "
+  echo test not implemented yet &&
+  test 1 = 2
+"
+
 test_expect_success '--bufsize sets buffer size correctly' "
   echo test not implemented yet &&
   test 1 = 2
