@@ -116,7 +116,7 @@ test_expect_success '--count prints to fd 3 with correct integer sequence' "
   test_cmp actual expected
 "
 
-test_expect_success '--bufsize allows exact amount of large payloads be emitted'"
+test_expect_success '--bufsize allows exact amount of large payloads be emitted' "
   echo 10 >expected &&
   printf '%10000s' | sed 's/ /\0/g' >largeline &&
   printf '%10s' | sed \"s/ /\$(cat largeline)\\n/g\" >theinput &&
@@ -153,8 +153,11 @@ test_expect_success '--group json emits exact amount of complete json payloads' 
 "
 
 test_expect_success '--group csv emits exact amount of newline entries' "
-  printf '%10000s' | sed 's/ /\0/g'
-  printf '%10s' | sed 's/ /\$RANDOM\\n/g' >theinput &&
+  echo 10 >expected &&
+  printf '%10000s' | sed 's/ /\0/g' >largeline &&
+  printf '%10s' | sed \"s/ /\$(cat largeline)\\n/g\" >theinput &&
+  nfcycler 24 --count --bufsize 20000 <theinput 3>&1 | tail -n1 >actual &&
+  test_cmp actual expected
 "
 
 test_expect_success '--delimiter "\n" emits exact amount of newline entries' "
