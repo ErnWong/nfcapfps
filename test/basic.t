@@ -112,13 +112,13 @@ test_expect_success 'supports float as fps arg (fps=0.25)' "
 test_expect_success '--count prints to fd 3 with correct integer sequence' "
   sequence 1 1000 1 >expected &&
   printf '%1000s' | sed 's/ /\$RANDOM\\n/g' >theinput &&
-  nfcycler --count 24 3>actual &&
+  nfcapfps --count 24 3>actual &&
   test_cmp actual expected
 "
 
 test_expect_success '--count does not disturb stdout' "
   printf '%1000s' | sed 's/ /\$RANDOM\\n/g' >expected &&
-  nfcycler --count 24 >actual &&
+  nfcapfps --count 24 >actual &&
   test_cmp actual expected
 "
 
@@ -126,14 +126,14 @@ test_expect_success '--bufsize allows exact amount of large payloads be emitted'
   echo 10 >expected &&
   printf '%10000s' | sed 's/ /0/g' >largeline &&
   printf '%10s' | sed \"s/ /\$(cat largeline)\\n/g\" >theinput &&
-  nfcycler 24 --count --bufsize 20000 <theinput 3>&1 | tail -n1 >actual &&
+  nfcapfps 24 --count --bufsize 20000 <theinput 3>&1 | tail -n1 >actual &&
   test_cmp actual expected
 "
 
 test_expect_success '--bufsize maintains accuracy of stdout' "
   printf '%10000s' | sed 's/ /0/g' >largeline &&
   printf '%10s' | sed \"s/ /\$(cat largeline)\\n/g\" >expected &&
-  nfcycler 24 --count --bufsize 20000 <theinput >actual &&
+  nfcapfps 24 --count --bufsize 20000 <theinput >actual &&
   test_cmp actual expected
 "
 
@@ -161,7 +161,7 @@ test_expect_success '--group json emits exact amount of complete json payloads' 
     \"b\": 1
   }
   []' >theinput &&
-  nfcycler 24 --group json --count <theinput | tail -n1 >actual &&
+  nfcapfps 24 --group json --count <theinput | tail -n1 >actual &&
   test_cmp actual expected
 "
 
@@ -184,7 +184,7 @@ test_expect_success '--group maintains accuracy of stdout' "
     \"b\": 1
   }
   []' >expected &&
-  nfcycler 24 --group json --count <theinput >actual &&
+  nfcapfps 24 --group json --count <theinput >actual &&
   test_cmp actual expected
 "
 
@@ -192,7 +192,7 @@ test_expect_success '--group csv emits exact amount of newline entries' "
   echo 10 >expected &&
   printf '%10000s' | sed 's/ /0/g' >largeline &&
   printf '%10s' | sed \"s/ /\$(cat largeline)\\n/g\" >theinput &&
-  nfcycler 24 --count --group csv <theinput 3>&1 | tail -n1 >actual &&
+  nfcapfps 24 --count --group csv <theinput 3>&1 | tail -n1 >actual &&
   test_cmp actual expected
 "
 
@@ -200,7 +200,7 @@ test_expect_success '--delimiter "\n" emits exact amount of newline entries' "
   echo 10 >expected &&
   printf '%10000s' | sed 's/ /0/g' >largeline &&
   printf '%10s' | sed \"s/ /\$(cat largeline)\\n/g\" >theinput &&
-  nfcycler 24 --count --delimiter \"\\n\" <theinput 3>&1 | tail -n1 >actual &&
+  nfcapfps 24 --count --delimiter \"\\n\" <theinput 3>&1 | tail -n1 >actual &&
   test_cmp actual expected
 "
 
@@ -213,28 +213,28 @@ test_expect_success '--delimiter works with any letter (e.g. "a")' "
   bcdeaa
   %10000s a
   %10000s a' >theinput &&
-  nfcycler 24 --count --delimiter \"a\" <theinput 3>&1 | tail -n1 >actual &&
+  nfcapfps 24 --count --delimiter \"a\" <theinput 3>&1 | tail -n1 >actual &&
   test_cmp actual expected
 "
 
 test_expect_success '--delimiter count increments at 1st character of stream' "
   echo 1 > expected &&
   printf '123' >theinput &&
-  nfcycler 24 --count --delimiter \"a\" <theinput 3>&1 | tail -n1 >actual &&
+  nfcapfps 24 --count --delimiter \"a\" <theinput 3>&1 | tail -n1 >actual &&
   test_cmp actual expected
 "
 
 test_expect_success '--delimiter count doesnt increment upon reaching delimiter' "
   echo 1 > expected &&
   printf '123a' >theinput &&
-  nfcycler 24 --count --delimiter \"a\" <theinput 3>&1 | tail -n1 >actual &&
+  nfcapfps 24 --count --delimiter \"a\" <theinput 3>&1 | tail -n1 >actual &&
   test_cmp actual expected
 "
 
 test_expect_success '--delimiter count increments at 1st character after delimiter' "
   echo 2 > expected &&
   printf '123a1' >theinput &&
-  nfcycler 24 --count --delimiter \"a\" <theinput 3>&1 | tail -n1 >actual &&
+  nfcapfps 24 --count --delimiter \"a\" <theinput 3>&1 | tail -n1 >actual &&
   test_cmp actual expected
 "
 
@@ -247,7 +247,7 @@ test_expect_success '--delimiter works with any number (e.g. "0")' "
   bcde00
   %10000s 0
   %10000s 0' >theinput &&
-  nfcycler 24 --count --delimiter \"0\" <theinput 3>&1 | tail -n1 >actual &&
+  nfcapfps 24 --count --delimiter \"0\" <theinput 3>&1 | tail -n1 >actual &&
   test_cmp actual expected
 "
 
@@ -260,7 +260,7 @@ test_expect_success '--delimiter works with a string (e.g. "abcde")' "
   bcdeabcdeabcde
   %10000s abcde
   %10000s abcde' >theinput &&
-  nfcycler 24 --count --delimiter \"abcde\" <theinput 3>&1 | tail -n1 >actual &&
+  nfcapfps 24 --count --delimiter \"abcde\" <theinput 3>&1 | tail -n1 >actual &&
   test_cmp actual expected
 "
 
@@ -269,7 +269,7 @@ test_expect_success '--delimiter complains about missing arg' "
 "
 
 test_expect_success 'complains when both --delimiter and --group are supplied' "
-  test_expect_code 64 nfcycler 24 --delimiter ',' --group json
+  test_expect_code 64 nfcapfps 24 --delimiter ',' --group json
 "
 
 test_done
